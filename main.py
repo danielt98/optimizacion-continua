@@ -1,50 +1,72 @@
 import numpy as np
-from hillclimbing import hillclimbing
-from sphere import sphere
-from step import step
-from schwefel import schwefel
-from rastrigin import rastrigin
-from griewank import griewank
+from functions.sphere import sphere
+from functions.step import step
+from functions.schwefel import schwefel
+from functions.rastrigin import rastrigin
+from functions.griewank import griewank
+from functions.ackley import ackley
 import matplotlib.pyplot as plt
-from hillclimbingRandom import hillclimbingRandom
-from hillclimbingReplacement import hillclimbingReplacement
+from algorithms.hillclimbing import hillclimbing
+from algorithms.hillclimbingReplacement import hillclimbingReplacement
+from algorithms.hillclimbingReplacementOpuestaCaos import hillclimbingReplacementOpuestaCaos
+from excelExport import  excelExport
+import time
 
 if __name__ == '__main__':
-    # myStep = step (-5.0, 5.0)
-    # input = np.arrange(1,4);
-    # result = myStep.evaluate(input)
-    # print (result)
-    #Semilla inicial en el proceso de generar numeros aleatorios
-    np.random.seed(1000)
-    #myStep = step(-5.0, 5.0)
-    #myHC = hillclimbing(myStep, 2, 1000, 0.5)
+    maxRepetitions = 31
+    maxIterations = 1000
+    dimensions = 10
+    avgX = np.arange(0, maxIterations)
 
-    #mySphere = sphere(-5.0, 5.0)
-    #myHC = hillclimbing(mySphere, 4, 100, 0.5)
-
-    #mySchwefel = schwefel(-5.0, 5.0)
-    #myHC = hillclimbing(mySchwefel, 4, 100, 0.5)
-
-    #myRastrigin = rastrigin(-5.0, 5.0)
-    #myHC = hillclimbing(myRastrigin, 2, 100, 0.5)
-
-    myGriewank = griewank(-5.0, 5.0)
-    myHC = hillclimbing(myGriewank,2, 100, 0.5)
-
-    [x, y] = myHC.evolve()
-
-    mysphere = sphere(-5.0, 5.0)
+    myStep = step(-100, 100)
+    mySphere = sphere(-100, 100)
+    mySchwefel = schwefel(-100, 100)
+    myRastrigin = rastrigin(-5.12, 5.12)
+    myGriewank = griewank(-600, 600)
+    myAckley = ackley(-32, 32)
     #myHCR = hillclimbingRandom(mysphere, 4, 100, 0.5, 20)
-    #[x, y] = myHCR.evolve()
+    myProblems = {'Sphere':[mySphere,None,None],
+                  'Step':[myStep,None,None],
+                  'Schwefel':[mySchwefel,None,None],
+                  'Rastrigin':[myRastrigin,None,None],
+                  'Griewank':[myGriewank,None,None],
+                  'Ackley':[myAckley,None,None]}
+    # myHCReplac= hillclimbing(myProblems[function][0], dimensions, maxIterations, 0.6)
+    myHCReplace = hillclimbingReplacement(dimensions, maxIterations, 0.6)
+    # | Dimenciones | Repeticiones | BW | Step | Cantidad que se van a estar ajustando
+    myHCReplaceOC = hillclimbingReplacementOpuestaCaos(dimensions, maxIterations, 0.6, 0.09,7)
+    myAlgorithms = [myHCReplace,myHCReplaceOC]
+    for function in myProblems:
+        best = []
+        pos = 0
+        times = []
+        for algorithm in myAlgorithms:
+            avgY = np.zeros(maxIterations, float)
+            best.append(np.zeros(maxRepetitions, dtype=float))
+            times.append(np.copy(time.time()))
+            for i in range(maxRepetitions):
+                np.random.seed(i)
+                [x, y] = algorithm.evolve(myProblems[function][0])
+                best[pos][i] = algorithm.best.fitness
+                avgY = avgY + y
+            fin = time.time()
+            times[pos] =fin - times[pos]
+            plt.plot(avgX, avgY)
+            pos+=1
+        myProblems[function][2] = np.copy(times)
+        myProblems[function][1] = np.copy(best)
+        # plotting
+        plt.title("Convergence curve " + function)
+        plt.xlabel("Iteration")
+        plt.ylabel("Fitness")
+        plt.legend(["HCReplace","HCReplaceChaos"])
+        plt.show()
+    myExport = excelExport(myProblems)
+    myExport.evaluate()
 
-    #mysphere = sphere(-5.0, 5.0)
-    #myHCReplace = hillclimbingReplacement(mysphere, 4, 100, 0.5, 20)
-    #[x, y] = myHCReplace.evolve()
-
-
-    # plotting
-    plt.title("Convergence curve")
-    plt.xlabel("Iteration")
-    plt.ylabel("Fitness")
-    plt.plot(x, y, color="red")
+"""
+    fig1, ax1 = plt.subplots() 16:19
+    ax1.set_title('Box Plot for best solutions')
+    ax1.boxplot(best)
     plt.show()
+"""

@@ -7,8 +7,10 @@ class griewank:
     def evaluate(self, cells):
         # sphere = x[0]^2 + x[1]^2 + x[2]^2 + ... + x[n-1]^2
         product = 1
-        for i in range(0,len(cells)):
-            product = product * (np.cos(cells[i]/np.sqrt(i+1)) +1)
+        count= 1
+        for i in cells:
+            product = product * (np.cos(i/np.sqrt(count)) +1)
+            count+= 1
         summa = (cells * cells).sum()
         summa = 1/4000 * summa - product
         return summa
