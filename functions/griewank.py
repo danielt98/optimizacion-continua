@@ -14,3 +14,5 @@ class griewank:
         summa = (cells * cells).sum()
         summa = 1/4000 * summa - product
         return summa
+    def __str__(self) -> str:
+        return "Griewank"

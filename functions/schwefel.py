@@ -13,3 +13,5 @@ class schwefel:
                 suma = suma + cells[j]
             summa = suma * suma + summa
         return summa
+    def __str__(self) -> str:
+        return "Schwefel"

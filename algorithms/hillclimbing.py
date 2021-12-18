@@ -3,14 +3,15 @@ import numpy as np
 
 
 class hillclimbing:
-    def __init__(self, function, dimension: int, maxIterations: int, bw: float):
-        self.best = solution(dimension, function)
-        self.function = function
+    def __init__(self, dimension: int, maxIterations: int, bw: float):
+        self.dimension = dimension
         self.maxiterations = maxIterations
         #Efecto al tweak (r)
         self.bandwith = bw
 
-    def evolve(self):
+    def evolve(self,function):
+        self.best = solution(self.dimension, function)
+        self.function = function
         #Incluyendo inicion y excluyendo fin llena de 0 es decir [0,1...HastaMaximoIterations-1)
         x = np.arange(0, self.maxiterations)
         #Llena de 0 flotante hasta maxiterations
@@ -30,5 +31,7 @@ class hillclimbing:
                 self.best.from_solution(copyofbest)
             #Asgina solucion a vecino
             y[iteration] = self.best.fitness
-        self.best.show()
         return [x, y]
+
+    def __str__(self) -> str:
+        return "HC-Normal"

@@ -7,3 +7,5 @@ class sphere:
         # sphere = x[0]^2 + x[1]^2 + x[2]^2 + ... + x[n-1]^2
         summa = (cells * cells).sum()
         return summa
+    def __str__(self) -> str:
+        return "Shpere"

@@ -12,3 +12,5 @@ class step:
         #Eleva al 2 y suma cada celda
         summa = ( newcells * newcells).sum()
         return summa
+    def __str__(self) -> str:
+        return "Step"

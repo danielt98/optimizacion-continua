@@ -50,3 +50,6 @@ class hillclimbingReplacementOpuestaCaos:
                 self.best.from_solution(initialSolution)
         #self.best.show()
         return [x, y]
+
+    def __str__(self) -> str:
+        return "HC-Modificado"

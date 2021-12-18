@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 from algorithms.hillclimbing import hillclimbing
 from algorithms.hillclimbingReplacement import hillclimbingReplacement
 from algorithms.hillclimbingReplacementOpuestaCaos import hillclimbingReplacementOpuestaCaos
-from excelExport import  excelExport
+from excelExport import excelExport
 import time
 
 if __name__ == '__main__':
-    maxRepetitions = 31
+    maxRepetitions = 30
     maxIterations = 1000
     dimensions = 10
     avgX = np.arange(0, maxIterations)
@@ -25,43 +25,39 @@ if __name__ == '__main__':
     myGriewank = griewank(-600, 600)
     myAckley = ackley(-32, 32)
     #myHCR = hillclimbingRandom(mysphere, 4, 100, 0.5, 20)
-    myProblems = {'Sphere':[mySphere,None,None],
-                  'Step':[myStep,None,None],
-                  'Schwefel':[mySchwefel,None,None],
-                  'Rastrigin':[myRastrigin,None,None],
-                  'Griewank':[myGriewank,None,None],
-                  'Ackley':[myAckley,None,None]}
-    # myHCReplac= hillclimbing(myProblems[function][0], dimensions, maxIterations, 0.6)
-    myHCReplace = hillclimbingReplacement(dimensions, maxIterations, 0.6)
+    myProblems = [mySphere,myStep,mySchwefel,myRastrigin,myGriewank,myAckley]
+    myHC = hillclimbing(dimensions, maxIterations, 0.9)
+    myHCReplace = hillclimbingReplacement(dimensions, maxIterations, 0.9)
     # | Dimenciones | Repeticiones | BW | Step | Cantidad que se van a estar ajustando
-    myHCReplaceOC = hillclimbingReplacementOpuestaCaos(dimensions, maxIterations, 0.6, 0.09,7)
-    myAlgorithms = [myHCReplace,myHCReplaceOC]
+    myHCReplaceOC = hillclimbingReplacementOpuestaCaos(dimensions, maxIterations, 0.9, 0.09,7)
+    myAlgorithms = [myHCReplace,myHCReplaceOC,myHC]
+    myLeg = []
+    myData = []
     for function in myProblems:
-        best = []
+        best = (np.zeros(maxRepetitions, dtype=float))
         pos = 0
-        times = []
+        times = 0
         for algorithm in myAlgorithms:
             avgY = np.zeros(maxIterations, float)
-            best.append(np.zeros(maxRepetitions, dtype=float))
-            times.append(np.copy(time.time()))
+            times = time.time()
             for i in range(maxRepetitions):
                 np.random.seed(i)
-                [x, y] = algorithm.evolve(myProblems[function][0])
-                best[pos][i] = algorithm.best.fitness
+                [x, y] = algorithm.evolve(function)
+                best[i] = algorithm.best.fitness
                 avgY = avgY + y
             fin = time.time()
-            times[pos] =fin - times[pos]
+            times =fin - times
             plt.plot(avgX, avgY)
             pos+=1
-        myProblems[function][2] = np.copy(times)
-        myProblems[function][1] = np.copy(best)
+            myLeg.append(str(algorithm))
+            myData.append([str(function),best.mean(),best.std(),best.max(),best.min(),times])
         # plotting
-        plt.title("Convergence curve " + function)
+        plt.title("Convergence curve " + str(function))
         plt.xlabel("Iteration")
         plt.ylabel("Fitness")
-        plt.legend(["HCReplace","HCReplaceChaos"])
+        plt.legend(myLeg)
         plt.show()
-    myExport = excelExport(myProblems)
+    myExport = excelExport(myData)
     myExport.evaluate()
 
 """

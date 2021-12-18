@@ -12,3 +12,5 @@ class ackley:
             sum2 += np.cos(2 * np.pi * i)
         n = float(len(cells))
         return -20.0 * np.exp(-0.2 * np.sqrt(sum1 / n)) - np.exp(sum2 / n) + 20 + np.e
+    def __str__(self) -> str:
+        return "Ackley"

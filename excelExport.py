@@ -2,19 +2,32 @@ import openpyxl
 
 # creating the DataFrame
 class excelExport:
-    def __init__(self, data):
+    def __init__(self, data,):
         self.data = data
 
     def evaluate(self):
         wb = openpyxl.Workbook()
         hoja = wb.active
         hoja.title = "Continua"
-        hoja.append(('Optiomizacion continua', 'Ascenso de la colina con remplazo','','','','','Optiomizacion continua opuesta por caos'))
-        hoja.append(('', 'Media','Desviación','Mejor','Peor','Tiempo','Media','Desviación','Mejor','Peor','Tiempo'))
+        hoja.append(('Optiomizacion continua', 'Ascenso de la colina con remplazo','','','','','Algoritmo modificado','','','','','Ascenso a la colina '))
+        hoja.append(('', 'Media','Desviación','Mejor','Peor','Tiempo','Media','Desviación','Mejor','Peor','Tiempo','Media','Desviación','Mejor','Peor','Tiempo'))
         hoja.merge_cells(start_row=1, start_column=2, end_row=1, end_column=6)
         hoja.merge_cells(start_row=1, start_column=7, end_row=1, end_column=11)
+        hoja.merge_cells(start_row=1, start_column=12, end_row=1, end_column=16)
         hoja.merge_cells(start_row=1, start_column=1, end_row=2, end_column=1)
-        for function in self.data:
-            hoja.append((function, self.data[function][1][0].mean(), self.data[function][1][0].std(), self.data[function][1][0].max(), self.data[function][1][0].min(),self.data[function][2][0].min(),
-                                   self.data[function][1][1].mean(), self.data[function][1][1].std(), self.data[function][1][1].max(), self.data[function][1][1].min(), self.data[function][2][1].min()))
+        auxProblem = self.data[0][0]
+        row = []
+        row.append(auxProblem)
+        for solution in self.data:
+            problem = solution[0]
+            if auxProblem == problem:
+                for i in range(1,len(solution)):
+                    row.append(solution[i])
+            else:
+                hoja.append(row)
+                row = []
+                row.append(problem)
+                auxProblem = problem
+                for i in range(1,len(solution)):
+                    row.append(solution[i])
         wb.save('opContinua.xlsx')
