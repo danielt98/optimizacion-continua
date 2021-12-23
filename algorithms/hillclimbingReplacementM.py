@@ -2,16 +2,16 @@ from solution import solution
 import numpy as np
 
 
-class hillclimbingReplacementOpuestaCaos:
-    def __init__(self, dimension: int, maxIterations: int, sigma: float,step:float,nchanges:int):
+class hillclimbingReplacementM:
+    def __init__(self, dimension: int, maxIterations: int, sigma: float,step:float,probabilityGauss:int,neighbors:int):
         self.dimension = dimension
+        self.probabilityGauss = probabilityGauss
         #Efecto al tweak (r)
         self.sigma = sigma
         #Cantidad vecinos reinicio aleatorio
-        self.neighbors = 100
+        self.neighbors = neighbors
         self.maxiterations = maxIterations
         self.step = step
-        self.nchanges = nchanges
 
     def evolve(self,function):
         self.best = solution(self.dimension, function)
@@ -21,7 +21,7 @@ class hillclimbingReplacementOpuestaCaos:
         #Llena de 0 flotante hasta maxiterations
         y = np.zeros(self.maxiterations, float)
         #Inicio algoritmo para sacar un fitness //Step
-        self.best.randomInitializationVariaton(self.step,self.nchanges)
+        self.best.randomInitializationVariaton(self.step)
         initialSolution = solution(self.best.size, self.best.function)
         initialSolution.from_solution(self.best)
         realiterations = int(self.maxiterations / self.neighbors)
@@ -30,14 +30,14 @@ class hillclimbingReplacementOpuestaCaos:
         for iteration in range(realiterations):
             copyofbest = solution(self.best.size, self.best.function)
             copyofbest.from_solution(self.best)
-            copyofbest.tweakVariation(self.sigma)
+            copyofbest.tweakVariation(self.sigma,self.probabilityGauss)
             for iNeig in range(self.neighbors):
                 #Nueva posible solucion
                 copyTweak = solution(self.best.size, self.best.function)
                 #Asignar paramentros a la copia
                 copyTweak.from_solution(self.best)
                 #Ajuste
-                copyTweak.tweakVariation(self.sigma)
+                copyTweak.tweakVariation(self.sigma,self.probabilityGauss)
                 # Si la nueva solucion es menor que la anterior, remplazar
                 if copyTweak.fitness < copyofbest.fitness:
                     copyofbest.from_solution(copyTweak)

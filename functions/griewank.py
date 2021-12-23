@@ -7,12 +7,10 @@ class griewank:
     def evaluate(self, cells):
         # sphere = x[0]^2 + x[1]^2 + x[2]^2 + ... + x[n-1]^2
         product = 1
-        count= 1
-        for i in cells:
-            product = product * (np.cos(i/np.sqrt(count)) +1)
-            count+= 1
         summa = (cells * cells).sum()
-        summa = 1/4000 * summa - product
+        for i in range(len(cells)):
+            product = product * (np.cos(cells[i] / np.sqrt(i+1)))
+        summa = summa/4000 - product + 1
         return summa
     def __str__(self) -> str:
         return "Griewank"
